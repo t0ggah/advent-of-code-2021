@@ -1,37 +1,31 @@
 use std::str::FromStr;
 
-fn part1(input: &'static str) -> u32 {
+fn part1(input: &str) -> u32 {
     let numbers = parse_lines::<u32>(input);
 
     count_increases(numbers)
 }
 
-fn part2(input: &'static str) -> u32 {
-    let numbers = parse_lines::<u32>(input).collect::<Vec<_>>();
-    let windows = (0..numbers.len() - 2).map(|i| numbers[i..i + 3].into_iter().sum());
+fn part2(input: &str) -> u32 {
+    let numbers = parse_lines::<u32>(input);
+    let windows = numbers.windows(3).map(|x| x.iter().sum()).collect();
 
     count_increases(windows)
 }
 
-fn count_increases(mut iter: impl Iterator<Item = u32>) -> u32 {
-    let mut count = 0;
-    let mut previous_number = iter.next().unwrap();
-    for number in iter {
-        if number > previous_number {
-            count += 1;
-        }
-        previous_number = number;
-    }
-
-    count
+fn count_increases(vec: Vec<u32>) -> u32 {
+    vec.windows(2).fold(
+        0,
+        |sum, window| if window[0] < window[1] { sum + 1 } else { sum },
+    )
 }
 
-fn parse_lines<T>(input: &'static str) -> impl Iterator<Item = T>
+fn parse_lines<T>(input: &str) -> Vec<T>
 where
     T: FromStr,
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
-    input.lines().map(|x| x.parse::<T>().unwrap())
+    input.lines().map(|x| x.parse::<T>().unwrap()).collect()
 }
 
 fn main() {
