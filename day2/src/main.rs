@@ -13,7 +13,7 @@ impl std::error::Error for CommandParseError {}
 
 impl std::fmt::Display for CommandParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "couldn't parse the str in Command")
+        write!(f, "couldn't parse the str into Command")
     }
 }
 
