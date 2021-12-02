@@ -21,16 +21,15 @@ impl FromStr for Command {
     type Err = Box<dyn std::error::Error>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut iter = s.split(' ');
-
-        let command_part = iter.next();
-        let number_part = iter.next();
-
-        match (command_part, number_part) {
-            (Some("forward"), Some(n)) => Ok(Command::Forward(n.parse()?)),
-            (Some("up"), Some(n)) => Ok(Command::Up(n.parse()?)),
-            (Some("down"), Some(n)) => Ok(Command::Down(n.parse()?)),
-            _ => Err(Box::new(CommandParseError)),
+        if let Some((command_part, number_part)) = s.split_once(' ') {
+            match (command_part, number_part.parse()) {
+                ("forward", Ok(n)) => Ok(Command::Forward(n)),
+                ("up", Ok(n)) => Ok(Command::Up(n)),
+                ("down", Ok(n)) => Ok(Command::Down(n)),
+                _ => Err(Box::new(CommandParseError)),
+            }
+        } else {
+            Err(Box::new(CommandParseError))
         }
     }
 }
