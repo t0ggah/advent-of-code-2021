@@ -1,43 +1,60 @@
+use std::str::FromStr;
+
+enum Command {
+    Forward(i32),
+    Up(i32),
+    Down(i32),
+}
+
+#[derive(Debug, Clone)]
+struct CommandParseError;
+
+impl std::error::Error for CommandParseError {}
+
+impl std::fmt::Display for CommandParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "couldn't parse the str in Command")
+    }
+}
+
+impl FromStr for Command {
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut iter = s.split(' ');
+
+        let command_part = iter.next();
+        let number_part = iter.next();
+
+        match (command_part, number_part) {
+            (Some("forward"), Some(n)) => Ok(Command::Forward(n.parse()?)),
+            (Some("up"), Some(n)) => Ok(Command::Up(n.parse()?)),
+            (Some("down"), Some(n)) => Ok(Command::Down(n.parse()?)),
+            _ => Err(Box::new(CommandParseError)),
+        }
+    }
+}
+
 fn part1(input: &str) -> (i32, i32) {
     input
         .lines()
-        .map(|x| {
-            let mut line_iter = x.split(' ');
-
-            let command = line_iter.next().unwrap();
-            let number = line_iter.next().unwrap().parse().unwrap();
-
-            match (command, number) {
-                ("forward", n) => (n, 0),
-                ("up", n) => (0, 0 - n),
-                ("down", n) => (0, n),
-                _ => (0, 0),
-            }
+        .map(|x| x.parse::<Command>().unwrap())
+        .fold((0, 0), |(px, py), command| match command {
+            Command::Forward(n) => (px + n, py),
+            Command::Up(n) => (px, py - n),
+            Command::Down(n) => (px, py + n),
         })
-        .fold((0, 0), |(px, py), (x, y)| (px + x, py + y))
 }
 
 fn part2(input: &str) -> (i32, i32) {
-    let (x, y, _aim) = input
-        .lines()
-        .map(|x| {
-            let mut line_iter = x.split(' ');
-
-            let command = line_iter.next().unwrap();
-            let number = line_iter.next().unwrap().parse().unwrap();
-
-            match (command, number) {
-                ("forward", n) => (n, 0),
-                ("up", n) => (0, 0 - n),
-                ("down", n) => (0, n),
-                _ => (0, 0),
-            }
-        })
-        .fold((0, 0, 0), |(px, py, pa), (x, y)| match (x, y) {
-            (0, n) => (px, py, pa + n),
-            (n, 0) => (px + n, py + (pa * n), pa),
-            _ => (px, py, pa),
-        });
+    let (x, y, _aim) = input.lines().map(|x| x.parse::<Command>().unwrap()).fold(
+        (0, 0, 0),
+        |(x, y, aim), command| match command {
+            Command::Up(n) => (x, y, aim - n),
+            Command::Down(n) => (x, y, aim + n),
+            Command::Forward(n) => (x + n, y + (aim * n), aim),
+        },
+    );
     (x, y)
 }
 
