@@ -7,20 +7,18 @@ fn part1(input: &str) -> u32 {
         .reduce(|counts, bytes| counts.iter().zip(bytes).map(|(c, b)| c + b).collect())
         .unwrap();
 
-    let input_length = input.lines().count();
+    let input_lines_count = input.lines().count();
+    let input_length = ones_count.len();
     let mut gamma_rate: u32 = 0;
-    for (index, count) in ones_count.iter().enumerate() {
-        if (*count as usize) > (input_length / 2) {
-            gamma_rate =
-                gamma_rate | 1u32.rotate_left((ones_count.len() - index - 1).try_into().unwrap());
-        }
-    }
-
     let mut epsilon_rate: u32 = 0;
+    let leftmost_bit_position = (input_length - 1) as u32;
+
     for (index, count) in ones_count.iter().enumerate() {
-        if (*count as usize) < (input_length / 2) {
-            epsilon_rate =
-                epsilon_rate | 1u32.rotate_left((ones_count.len() - index - 1).try_into().unwrap());
+        if (*count as usize) > (input_lines_count / 2) {
+            gamma_rate += 2u32.pow(leftmost_bit_position - index as u32);
+        }
+        if (*count as usize) < (input_lines_count / 2) {
+            epsilon_rate += 2u32.pow(leftmost_bit_position - index as u32);
         }
     }
 
