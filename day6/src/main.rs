@@ -1,4 +1,4 @@
-fn emulate_lanterfish_lives(input: &str, days: u32) -> usize {
+fn emulate_lanterfish_and_count(input: &str, days: u32) -> usize {
     let fishes = input
         .split(',')
         .map(|x| x.trim().parse().unwrap())
@@ -26,11 +26,11 @@ fn emulate_lanterfish_lives(input: &str, days: u32) -> usize {
 }
 
 fn part1(input: &str) -> usize {
-    emulate_lanterfish_lives(input, 80)
+    emulate_lanterfish_and_count(input, 80)
 }
 
 fn part2(input: &str) -> usize {
-    emulate_lanterfish_lives(input, 256)
+    emulate_lanterfish_and_count(input, 256)
 }
 
 fn main() {
