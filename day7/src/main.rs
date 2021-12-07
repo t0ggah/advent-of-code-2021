@@ -4,21 +4,16 @@ fn part1(input: &str) -> i32 {
         .map(|x| x.trim().parse().unwrap())
         .collect();
 
-    let min = crabs.iter().min().copied().unwrap();
-    let max = crabs.iter().max().copied().unwrap();
-    let mut current_min_fuel: Option<(i32, i32)> = None;
-    for i in min..=max {
-        let fuel = crabs.iter().map(|x| (x - i).abs()).sum();
-        if let Some(min_fuel) = current_min_fuel {
-            if min_fuel.1 > fuel {
-                current_min_fuel = Some((i, fuel));
-            }
-        } else {
-            current_min_fuel = Some((i, fuel));
-        }
-    }
-
-    current_min_fuel.unwrap().1
+    let fuel_cost = |column: i32| {
+        return move |x: &i32| (x - column).abs();
+    };
+    let min_column = crabs.iter().min().copied().unwrap();
+    let max_column = crabs.iter().max().copied().unwrap();
+    let max_column_fuel = crabs.iter().map(fuel_cost(max_column)).sum();
+    (min_column..max_column).fold(max_column_fuel, |min_fuel, column| {
+        let fuel = crabs.iter().map(fuel_cost(column)).sum();
+        min_fuel.min(fuel)
+    })
 }
 
 fn part2(input: &str) -> i32 {
@@ -27,29 +22,21 @@ fn part2(input: &str) -> i32 {
         .map(|x| x.trim().parse().unwrap())
         .collect();
 
-    let min = crabs.iter().min().copied().unwrap();
-    let max = crabs.iter().max().copied().unwrap();
-    let mut current_min_fuel: Option<i32> = None;
-    for i in min..=max {
-        let fuel = crabs
-            .iter()
-            .map(|x| {
-                let n = (x - i).abs();
+    let fuel_cost = |column: i32| {
+        return move |x: &i32| {
+            let n = (x - column).abs();
 
-                (n * (n + 1)) / 2
-            })
-            .sum();
+            (n * (n + 1)) / 2
+        };
+    };
 
-        if let Some(min_fuel) = current_min_fuel {
-            if min_fuel > fuel {
-                current_min_fuel = Some(fuel);
-            }
-        } else {
-            current_min_fuel = Some(fuel);
-        }
-    }
-
-    current_min_fuel.unwrap()
+    let min_column = crabs.iter().min().copied().unwrap();
+    let max_column = crabs.iter().max().copied().unwrap();
+    let max_column_fuel = crabs.iter().map(fuel_cost(max_column)).sum();
+    (min_column..max_column).fold(max_column_fuel, |min_fuel, column| {
+        let fuel = crabs.iter().map(fuel_cost(column)).sum();
+        min_fuel.min(fuel)
+    })
 }
 
 fn main() {
