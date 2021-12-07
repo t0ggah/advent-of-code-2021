@@ -45,6 +45,7 @@ fn main() {
     assert_eq!(result, 1574445493136);
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
